@@ -57,8 +57,5 @@ A_numero1_suites_html.rtf
 # Ignore logs
 flutter_*.log
 
-# Ignore build scripts (often contain local paths)
-build_vercel.sh
-
 # Ignore local metadata
 .metadata
