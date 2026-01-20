@@ -8,7 +8,7 @@ class SuiteCard extends StatefulWidget {
   final String title;
   final String capacity;
   final String description;
-  final List<String> imageUrls; // Now required for unique images per suite
+  final List<String> imageUrls;
 
   const SuiteCard({
     super.key,
@@ -37,206 +37,259 @@ class _SuiteCardState extends State<SuiteCard> {
 
   @override
   Widget build(BuildContext context) {
-    return HoverLiftCard(
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          // Image Carousel
-          Stack(
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Responsive calculations based on available width
+        final isCompact = constraints.maxWidth < 320;
+        final cardPadding = isCompact ? 12.0 : 16.0;
+        final titleFontSize = isCompact ? 16.0 : 18.0;
+        final descFontSize = isCompact ? 12.0 : 13.0;
+
+        // Image height as a percentage of available height (around 50%)
+        // Use AspectRatio for consistent image display
+        final imageHeight = constraints.maxHeight * 0.48;
+
+        return HoverLiftCard(
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
+              // Image Carousel with constrained height
               SizedBox(
-                height: 280,
-                child: PageView.builder(
-                  controller: _pageController,
-                  onPageChanged: (index) {
-                    setState(() {
-                      _currentPage = index;
-                    });
-                  },
-                  itemCount: widget.imageUrls.length,
-                  itemBuilder: (context, index) {
-                    return GestureDetector(
-                      onTap: () => _openGalleryModal(context, index),
-                      child: widget.imageUrls[index].startsWith('http')
-                          ? Image.network(
-                              widget.imageUrls[index],
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  Container(color: Colors.grey[200]),
-                            )
-                          : Image.asset(
-                              widget.imageUrls[index],
-                              fit: BoxFit.cover,
-                              errorBuilder: (_, __, ___) =>
-                                  Container(color: Colors.grey[200]),
+                height: imageHeight.clamp(180, 280),
+                child: Stack(
+                  children: [
+                    PageView.builder(
+                      controller: _pageController,
+                      onPageChanged: (index) {
+                        setState(() {
+                          _currentPage = index;
+                        });
+                      },
+                      itemCount: widget.imageUrls.length,
+                      itemBuilder: (context, index) {
+                        return GestureDetector(
+                          onTap: () => _openGalleryModal(context, index),
+                          child: widget.imageUrls[index].startsWith('http')
+                              ? Image.network(
+                                  widget.imageUrls[index],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (_, __, ___) =>
+                                      Container(color: Colors.grey[200]),
+                                )
+                              : Image.asset(
+                                  widget.imageUrls[index],
+                                  fit: BoxFit.cover,
+                                  width: double.infinity,
+                                  errorBuilder: (_, __, ___) =>
+                                      Container(color: Colors.grey[200]),
+                                ),
+                        );
+                      },
+                    ),
+                    // Left Arrow - only show on hover/larger screens
+                    if (_currentPage > 0)
+                      Positioned(
+                        left: 8,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: _buildNavButton(
+                            icon: Icons.arrow_back_ios,
+                            onPressed: () {
+                              _pageController.previousPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    // Right Arrow
+                    if (_currentPage < widget.imageUrls.length - 1)
+                      Positioned(
+                        right: 8,
+                        top: 0,
+                        bottom: 0,
+                        child: Center(
+                          child: _buildNavButton(
+                            icon: Icons.arrow_forward_ios,
+                            onPressed: () {
+                              _pageController.nextPage(
+                                duration: const Duration(milliseconds: 300),
+                                curve: Curves.easeInOut,
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                    // Dots Indicator
+                    Positioned(
+                      bottom: 8,
+                      left: 0,
+                      right: 0,
+                      child: Row(
+                        mainAxisAlignment: MainAxisAlignment.center,
+                        children: List.generate(widget.imageUrls.length, (
+                          index,
+                        ) {
+                          return Container(
+                            margin: const EdgeInsets.symmetric(horizontal: 3),
+                            width: _currentPage == index ? 16 : 6,
+                            height: 6,
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(3),
+                              color: _currentPage == index
+                                  ? Colors.white
+                                  : Colors.white.withValues(alpha: 0.5),
                             ),
-                    );
-                  },
-                ),
-              ),
-              // Left Arrow
-              if (_currentPage > 0)
-                Positioned(
-                  left: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_back_ios,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        _pageController.previousPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black.withValues(alpha: 0.3),
+                          );
+                        }),
                       ),
                     ),
-                  ),
-                ),
-              // Right Arrow
-              if (_currentPage < widget.imageUrls.length - 1)
-                Positioned(
-                  right: 8,
-                  top: 0,
-                  bottom: 0,
-                  child: Center(
-                    child: IconButton(
-                      icon: const Icon(
-                        Icons.arrow_forward_ios,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        _pageController.nextPage(
-                          duration: const Duration(milliseconds: 300),
-                          curve: Curves.easeInOut,
-                        );
-                      },
-                      style: IconButton.styleFrom(
-                        backgroundColor: Colors.black.withValues(alpha: 0.3),
-                      ),
-                    ),
-                  ),
-                ),
-              // Dots Indicator
-              Positioned(
-                bottom: 12,
-                left: 0,
-                right: 0,
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: List.generate(widget.imageUrls.length, (index) {
-                    return Container(
-                      margin: const EdgeInsets.symmetric(horizontal: 4),
-                      width: 8,
-                      height: 8,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: _currentPage == index
-                            ? Colors.white
-                            : Colors.white.withValues(alpha: 0.5),
-                      ),
-                    );
-                  }),
+                  ],
                 ),
               ),
-            ],
-          ),
-          Expanded(
-            child: Padding(
-              padding: const EdgeInsets.all(20),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Title and Capacity Row - Fixed overflow
-                  Wrap(
-                    alignment: WrapAlignment.spaceBetween,
-                    crossAxisAlignment: WrapCrossAlignment.center,
-                    spacing: 4,
-                    runSpacing: 4,
+
+              // Content Section - Flexible
+              Expanded(
+                child: Padding(
+                  padding: EdgeInsets.all(cardPadding),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(
-                        widget.title,
-                        style: Theme.of(context).textTheme.headlineSmall
-                            ?.copyWith(
-                              fontFamily: 'Playfair Display',
-                              fontWeight: FontWeight.bold,
-                              color: AppColors.deepSea,
-                              fontSize: 20,
-                            ),
-                      ),
-                      // Capacity Badge
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 8,
-                          vertical: 4,
-                        ),
-                        decoration: BoxDecoration(
-                          border: Border.all(color: Colors.grey[300]!),
-                          borderRadius: BorderRadius.circular(4),
-                        ),
-                        child: Row(
-                          mainAxisSize: MainAxisSize.min,
-                          children: [
-                            Icon(
-                              Icons.people_outline,
-                              size: 14,
-                              color: AppColors.text,
-                            ),
-                            const SizedBox(width: 4),
-                            Text(
-                              widget.capacity,
+                      // Title and Capacity
+                      Row(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          Expanded(
+                            child: Text(
+                              widget.title,
                               style: TextStyle(
-                                fontSize: 11,
-                                color: AppColors.text,
+                                fontFamily: 'Playfair Display',
+                                fontWeight: FontWeight.bold,
+                                color: AppColors.deepSea,
+                                fontSize: titleFontSize,
                               ),
+                              maxLines: 2,
+                              overflow: TextOverflow.ellipsis,
                             ),
-                          ],
+                          ),
+                          const SizedBox(width: 8),
+                          // Capacity Badge
+                          Container(
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 6,
+                              vertical: 3,
+                            ),
+                            decoration: BoxDecoration(
+                              border: Border.all(color: Colors.grey[300]!),
+                              borderRadius: BorderRadius.circular(4),
+                            ),
+                            child: Row(
+                              mainAxisSize: MainAxisSize.min,
+                              children: [
+                                Icon(
+                                  Icons.people_outline,
+                                  size: 12,
+                                  color: AppColors.text,
+                                ),
+                                const SizedBox(width: 3),
+                                Text(
+                                  widget.capacity,
+                                  style: TextStyle(
+                                    fontSize: 10,
+                                    color: AppColors.text,
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                      const SizedBox(height: 8),
+
+                      // Description - truncated for compact
+                      Expanded(
+                        child: Text(
+                          widget.description,
+                          style: TextStyle(
+                            color: AppColors.text.withValues(alpha: 0.8),
+                            height: 1.4,
+                            fontSize: descFontSize,
+                          ),
+                          maxLines: isCompact ? 2 : 3,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+                      const SizedBox(height: 8),
+
+                      // CTA Button - Full Width
+                      SizedBox(
+                        width: double.infinity,
+                        child: LuxuryButton(
+                          label: 'COTAR VALOR',
+                          onPressed: () => _openWhatsApp(widget.title),
+                          backgroundColor: AppColors.accent,
+                          textColor: Colors.white,
+                          compact: isCompact,
+                        ),
+                      ),
+                      const SizedBox(height: 6),
+
+                      // Gallery Link
+                      Center(
+                        child: TextButton.icon(
+                          onPressed: () => _openGalleryModal(context, 0),
+                          icon: const Icon(
+                            Icons.collections_outlined,
+                            size: 14,
+                          ),
+                          label: Text(
+                            'Ver ${widget.imageUrls.length} fotos',
+                            style: TextStyle(fontSize: isCompact ? 11 : 12),
+                          ),
+                          style: TextButton.styleFrom(
+                            foregroundColor: AppColors.text.withValues(
+                              alpha: 0.6,
+                            ),
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 8,
+                              vertical: 4,
+                            ),
+                            minimumSize: const Size(44, 36), // Touch target
+                          ),
                         ),
                       ),
                     ],
                   ),
-                  const SizedBox(height: 12),
-                  Text(
-                    widget.description,
-                    style: TextStyle(
-                      color: AppColors.text.withValues(alpha: 0.8),
-                      height: 1.5,
-                      fontSize: 14,
-                    ),
-                  ),
-                  const Spacer(),
-                  // "Cotar valor" full width button
-                  // Luxury Button
-                  SizedBox(
-                    width: double.infinity,
-                    child: LuxuryButton(
-                      label: 'COTAR VALOR',
-                      onPressed: () => _openWhatsApp(widget.title),
-                      backgroundColor: AppColors.accent,
-                      textColor: Colors.white,
-                    ),
-                  ),
-                  const SizedBox(height: 12),
-                  Center(
-                    child: TextButton.icon(
-                      onPressed: () => _openGalleryModal(context, 0),
-                      icon: const Icon(Icons.collections_outlined, size: 16),
-                      label: Text('Ver ${widget.imageUrls.length} fotos'),
-                      style: TextButton.styleFrom(
-                        foregroundColor: AppColors.text.withValues(alpha: 0.6),
-                      ),
-                    ),
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
+        );
+      },
+    );
+  }
+
+  // Helper for navigation buttons with proper touch target
+  Widget _buildNavButton({
+    required IconData icon,
+    required VoidCallback onPressed,
+  }) {
+    return Material(
+      color: Colors.black.withValues(alpha: 0.3),
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: onPressed,
+        borderRadius: BorderRadius.circular(20),
+        child: Container(
+          width: 36,
+          height: 36,
+          alignment: Alignment.center,
+          child: Icon(icon, color: Colors.white, size: 16),
+        ),
       ),
     );
   }

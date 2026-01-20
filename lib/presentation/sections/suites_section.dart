@@ -1,10 +1,18 @@
 import 'package:anumero1_flutter_web/core/theme/app_colors.dart';
 import 'package:anumero1_flutter_web/presentation/widgets/animated_entry.dart';
 import 'package:anumero1_flutter_web/presentation/widgets/suite_card.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
-class SuitesSection extends StatelessWidget {
+class SuitesSection extends StatefulWidget {
   const SuitesSection({super.key});
+
+  @override
+  State<SuitesSection> createState() => _SuitesSectionState();
+}
+
+class _SuitesSectionState extends State<SuitesSection> {
+  int _currentIndex = 0;
 
   // Define each suite with unique images
   static const List<Map<String, dynamic>> _suites = [
@@ -63,81 +71,98 @@ class SuitesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 48),
-      child: Column(
-        children: [
-          AnimatedEntry(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.accent.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                'Acomodações',
-                style: TextStyle(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          AnimatedEntry(
-            delay: const Duration(milliseconds: 100),
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                ),
-                children: [
-                  const TextSpan(text: 'Nossas '),
-                  TextSpan(
-                    text: 'Suítes',
-                    style: TextStyle(color: AppColors.accent),
-                  ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedEntry(
-            delay: const Duration(milliseconds: 200),
-            child: Text(
-              'Conforto e qualidade para sua estadia perfeita em Guarapari.',
-              style: TextStyle(
-                fontSize: 18,
-                color: AppColors.text.withValues(alpha: 0.7),
-              ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 64),
-          LayoutBuilder(
-            builder: (context, constraints) {
-              // Responsive grid
-              final cardWidth = constraints.maxWidth > 1200
-                  ? 380.0
-                  : constraints.maxWidth > 800
-                  ? 340.0
-                  : constraints.maxWidth - 48;
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Responsive breakpoints
+        // Mobile: < 600px, Tablet: 600-1024px, Desktop: > 1024px
+        final isMobile = constraints.maxWidth < 600;
+        final isTablet =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
 
-              return Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                alignment: WrapAlignment.center,
-                children: _suites.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final suite = entry.value;
+        // Viewport fraction determines how many cards are visible
+        // Mobile: 0.85 (single card with peek), Tablet: 0.5 (2 cards), Desktop: 0.33 (3 cards)
+        final viewportFraction = isMobile ? 0.85 : (isTablet ? 0.5 : 0.33);
+
+        // Card height adapts to screen size
+        final cardHeight = isMobile ? 520.0 : 580.0;
+
+        // Responsive padding
+        final horizontalPadding = isMobile ? 16.0 : 48.0;
+        final verticalPadding = isMobile ? 60.0 : 100.0;
+
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: verticalPadding,
+            horizontal: horizontalPadding,
+          ),
+          child: Column(
+            children: [
+              // Section Header
+              AnimatedEntry(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Acomodações',
+                    style: TextStyle(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 24),
+              AnimatedEntry(
+                delay: const Duration(milliseconds: 100),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      // Responsive font size
+                      fontSize: isMobile ? 28 : null,
+                    ),
+                    children: [
+                      const TextSpan(text: 'Nossas '),
+                      TextSpan(
+                        text: 'Suítes',
+                        style: TextStyle(color: AppColors.accent),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              AnimatedEntry(
+                delay: const Duration(milliseconds: 200),
+                child: Text(
+                  'Conforto e qualidade para sua estadia perfeita em Guarapari.',
+                  style: TextStyle(
+                    fontSize: isMobile ? 15 : 18,
+                    color: AppColors.text.withValues(alpha: 0.7),
+                  ),
+                  textAlign: TextAlign.center,
+                ),
+              ),
+              SizedBox(height: isMobile ? 32 : 64),
+
+              // Carousel Slider - Replaces Wrap for horizontal swiping
+              CarouselSlider.builder(
+                itemCount: _suites.length,
+                itemBuilder: (context, index, realIndex) {
+                  final suite = _suites[index];
                   return AnimatedEntry(
                     delay: Duration(milliseconds: 200 + (index * 100)),
-                    child: SizedBox(
-                      width: cardWidth,
-                      height: 600, // Increased height to prevent overflow
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
                       child: SuiteCard(
                         title: suite['title'] as String,
                         capacity: suite['capacity'] as String,
@@ -146,12 +171,44 @@ class SuitesSection extends StatelessWidget {
                       ),
                     ),
                   );
+                },
+                options: CarouselOptions(
+                  height: cardHeight,
+                  viewportFraction: viewportFraction,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.15,
+                  enableInfiniteScroll: true,
+                  autoPlay: false,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 24),
+
+              // Pagination Dots Indicator
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _suites.asMap().entries.map((entry) {
+                  return Container(
+                    width: _currentIndex == entry.key ? 24 : 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 4),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: _currentIndex == entry.key
+                          ? AppColors.accent
+                          : AppColors.text.withValues(alpha: 0.3),
+                    ),
+                  );
                 }).toList(),
-              );
-            },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 }

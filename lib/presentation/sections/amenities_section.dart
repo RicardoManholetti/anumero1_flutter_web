@@ -11,147 +11,187 @@ class AmenitiesSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 80, horizontal: 48),
-      color: const Color(0xFFF9F9F9),
-      child: Column(
-        children: [
-          AnimatedEntry(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.accent.withValues(alpha: 0.2),
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: const Text(
-                'Estrutura',
-                style: TextStyle(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        final horizontalPadding = isMobile ? 16.0 : 48.0;
+        final verticalPadding = isMobile ? 48.0 : 80.0;
+
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: verticalPadding,
+            horizontal: horizontalPadding,
+          ),
+          color: const Color(0xFFF9F9F9),
+          child: Column(
+            children: [
+              AnimatedEntry(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
+                  ),
+                  decoration: BoxDecoration(
+                    color: AppColors.accent.withValues(alpha: 0.2),
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: const Text(
+                    'Estrutura',
+                    style: TextStyle(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
               ),
-            ),
-          ),
-          const SizedBox(height: 24),
-          AnimatedEntry(
-            delay: const Duration(milliseconds: 100),
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
+              const SizedBox(height: 24),
+              AnimatedEntry(
+                delay: const Duration(milliseconds: 100),
+                child: RichText(
+                  textAlign: TextAlign.center,
+                  text: TextSpan(
+                    style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      fontSize: isMobile ? 24 : null,
+                    ),
+                    children: [
+                      const TextSpan(text: 'Tudo que Você '),
+                      TextSpan(
+                        text: 'Precisa',
+                        style: TextStyle(color: AppColors.accent),
+                      ),
+                    ],
+                  ),
                 ),
-                children: [
-                  const TextSpan(text: 'Tudo que Você '),
-                  TextSpan(
-                    text: 'Precisa',
-                    style: TextStyle(color: AppColors.accent),
-                  ),
-                ],
               ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedEntry(
-            delay: const Duration(milliseconds: 200),
-            child: Text(
-              'Estrutura completa para você aproveitar suas férias com conforto e tranquilidade.',
-              style: TextStyle(
-                fontSize: 18,
-                color: AppColors.text.withValues(alpha: 0.7),
+              const SizedBox(height: 16),
+              AnimatedEntry(
+                delay: const Duration(milliseconds: 200),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 8 : 0),
+                  child: Text(
+                    'Estrutura completa para você aproveitar suas férias com conforto e tranquilidade.',
+                    style: TextStyle(
+                      fontSize: isMobile ? 14 : 18,
+                      color: AppColors.text.withValues(alpha: 0.7),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
               ),
-              textAlign: TextAlign.center,
-            ),
-          ),
-          const SizedBox(height: 48),
-          // Compact centered grid
-          Center(
-            child: ConstrainedBox(
-              constraints: const BoxConstraints(maxWidth: 800), // Limit width
-              child: Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                alignment: WrapAlignment.center,
-                children: [
-                  _buildAmenityItem(FontAwesomeIcons.water, 'Piscina', 300),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.mugHot,
-                    'Área de Convivência',
-                    400,
+              SizedBox(height: isMobile ? 32 : 48),
+              // Compact centered grid
+              Center(
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(maxWidth: isMobile ? 400 : 800),
+                  child: Wrap(
+                    spacing: isMobile ? 12 : 24,
+                    runSpacing: isMobile ? 12 : 24,
+                    alignment: WrapAlignment.center,
+                    children: [
+                      _buildAmenityItem(
+                        FontAwesomeIcons.water,
+                        'Piscina',
+                        300,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.mugHot,
+                        'Área de Convivência',
+                        400,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.car,
+                        'Estacionamento Grátis',
+                        500,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.video,
+                        'Monitoramento',
+                        600,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.kitchenSet,
+                        'Cozinha Compartilhada',
+                        700,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.fireBurner,
+                        'Churrasqueira',
+                        800,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.locationDot,
+                        'Ótima Localização',
+                        900,
+                        isMobile,
+                      ),
+                      _buildAmenityItem(
+                        FontAwesomeIcons.banSmoking,
+                        'Não Fumantes',
+                        1000,
+                        isMobile,
+                      ),
+                    ],
                   ),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.car,
-                    'Estacionamento Grátis',
-                    500,
-                  ),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.video,
-                    'Monitoramento',
-                    600,
-                  ),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.kitchenSet,
-                    'Cozinha Compartilhada',
-                    700,
-                  ),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.fireBurner,
-                    'Churrasqueira',
-                    800,
-                  ),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.locationDot,
-                    'Ótima Localização',
-                    900,
-                  ),
-                  _buildAmenityItem(
-                    FontAwesomeIcons.banSmoking,
-                    'Não Fumantes',
-                    1000,
-                  ),
-                ],
+                ),
               ),
-            ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildAmenityItem(IconData icon, String title, int delayMs) {
+  Widget _buildAmenityItem(
+    IconData icon,
+    String title,
+    int delayMs,
+    bool isMobile,
+  ) {
+    final itemWidth = isMobile ? 100.0 : 140.0;
+    final iconSize = isMobile ? 60.0 : 80.0;
+    final iconInnerSize = isMobile ? 22.0 : 28.0;
+    final fontSize = isMobile ? 11.0 : 13.0;
+
     return AnimatedEntry(
       delay: Duration(milliseconds: delayMs),
       child: SizedBox(
-        width: 140, // Smaller fixed width
+        width: itemWidth,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           children: [
             // Magical Circle Icon
             MagicalHoverCard(
-              width: 80,
-              height: 80,
+              width: iconSize,
+              height: iconSize,
               borderRadius: BorderRadius.circular(100),
               elevation: 6,
               spotlightColor: AppColors.primary.withValues(alpha: 0.5),
               child: Center(
                 child: custom.AnimatedIcon(
                   icon: icon,
-                  size: 28,
+                  size: iconInnerSize,
                   color: AppColors.primary,
                   hoverColor: AppColors.accent,
                 ),
               ),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: 12),
             Text(
               title,
               textAlign: TextAlign.center,
               style: TextStyle(
                 fontWeight: FontWeight.w600,
                 color: AppColors.deepSea,
-                fontSize: 13,
+                fontSize: fontSize,
                 height: 1.2,
               ),
             ),

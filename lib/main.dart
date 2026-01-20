@@ -44,7 +44,10 @@ class AnumeroApp extends StatelessWidget {
         GlobalWidgetsLocalizations.delegate,
         GlobalCupertinoLocalizations.delegate,
       ],
-      home: const CinematicLoader(child: HomePage()),
+      home: const CinematicLoader(
+        duration: Duration(milliseconds: 300),
+        child: HomePage(),
+      ),
     );
   }
 }

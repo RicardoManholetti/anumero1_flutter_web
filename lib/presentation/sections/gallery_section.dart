@@ -1,7 +1,7 @@
 import 'package:anumero1_flutter_web/core/theme/app_colors.dart';
 import 'package:anumero1_flutter_web/presentation/widgets/animated_entry.dart';
 import 'package:anumero1_flutter_web/presentation/widgets/image_gallery_modal.dart';
-import 'package:anumero1_flutter_web/presentation/widgets/magical_hover_card.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
 class GallerySection extends StatefulWidget {
@@ -12,6 +12,8 @@ class GallerySection extends StatefulWidget {
 }
 
 class _GallerySectionState extends State<GallerySection> {
+  int _currentIndex = 0;
+
   final List<Map<String, dynamic>> _items = [
     {
       'title': 'Piscina ao Ar Livre',
@@ -49,174 +51,220 @@ class _GallerySectionState extends State<GallerySection> {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 80),
-      color: Colors.white,
-      child: Column(
-        children: [
-          // Header
-          AnimatedEntry(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-              decoration: BoxDecoration(
-                color: AppColors.champagne,
-                borderRadius: BorderRadius.circular(20),
-              ),
-              child: Text(
-                'Galeria',
-                style: TextStyle(
-                  color: AppColors.accent,
-                  fontWeight: FontWeight.bold,
-                  fontSize: 14,
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedEntry(
-            delay: const Duration(milliseconds: 100),
-            child: RichText(
-              textAlign: TextAlign.center,
-              text: TextSpan(
-                style: Theme.of(context).textTheme.displaySmall?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.deepSea,
-                ),
-                children: [
-                  const TextSpan(text: 'Conheça Nossa '),
-                  TextSpan(
-                    text: 'Estrutura',
-                    style: TextStyle(color: AppColors.accent),
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        // Responsive breakpoints
+        final isMobile = constraints.maxWidth < 600;
+        final isTablet =
+            constraints.maxWidth >= 600 && constraints.maxWidth < 1024;
+
+        // Viewport fraction: mobile shows 1 card, tablet shows 2, desktop shows all 3
+        final viewportFraction = isMobile ? 0.88 : (isTablet ? 0.5 : 0.33);
+
+        // Responsive card height
+        final cardHeight = isMobile ? 320.0 : 380.0;
+
+        // Responsive padding
+        final verticalPadding = isMobile ? 48.0 : 80.0;
+
+        return Container(
+          padding: EdgeInsets.symmetric(vertical: verticalPadding),
+          color: Colors.white,
+          child: Column(
+            children: [
+              // Header
+              AnimatedEntry(
+                child: Container(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 8,
                   ),
-                ],
-              ),
-            ),
-          ),
-          const SizedBox(height: 16),
-          AnimatedEntry(
-            delay: const Duration(milliseconds: 200),
-            child: Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 24),
-              child: Text(
-                'Espaços pensados para proporcionar conforto e momentos inesquecíveis durante sua estadia.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: AppColors.text.withValues(alpha: 0.7),
+                  decoration: BoxDecoration(
+                    color: AppColors.champagne,
+                    borderRadius: BorderRadius.circular(20),
+                  ),
+                  child: Text(
+                    'Galeria',
+                    style: TextStyle(
+                      color: AppColors.accent,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
+                  ),
                 ),
-                textAlign: TextAlign.center,
               ),
-            ),
-          ),
-          const SizedBox(height: 48),
+              const SizedBox(height: 16),
+              AnimatedEntry(
+                delay: const Duration(milliseconds: 100),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 16 : 24),
+                  child: RichText(
+                    textAlign: TextAlign.center,
+                    text: TextSpan(
+                      style: Theme.of(context).textTheme.displaySmall?.copyWith(
+                        fontWeight: FontWeight.bold,
+                        color: AppColors.deepSea,
+                        fontSize: isMobile ? 26 : null,
+                      ),
+                      children: [
+                        const TextSpan(text: 'Conheça Nossa '),
+                        TextSpan(
+                          text: 'Estrutura',
+                          style: TextStyle(color: AppColors.accent),
+                        ),
+                      ],
+                    ),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+              AnimatedEntry(
+                delay: const Duration(milliseconds: 200),
+                child: Padding(
+                  padding: EdgeInsets.symmetric(horizontal: isMobile ? 20 : 24),
+                  child: Text(
+                    'Espaços pensados para proporcionar conforto e momentos inesquecíveis durante sua estadia.',
+                    style: TextStyle(
+                      fontSize: isMobile ? 14 : 16,
+                      color: AppColors.text.withValues(alpha: 0.7),
+                    ),
+                    textAlign: TextAlign.center,
+                  ),
+                ),
+              ),
+              SizedBox(height: isMobile ? 32 : 48),
 
-          // Gallery Grid
-          LayoutBuilder(
-            builder: (context, constraints) {
-              return Wrap(
-                spacing: 24,
-                runSpacing: 24,
-                alignment: WrapAlignment.center,
-                children: _items.asMap().entries.map((entry) {
-                  final index = entry.key;
-                  final item = entry.value;
-
-                  // Responsive card width calculation
-                  double cardWidth = 500;
-                  if (constraints.maxWidth < 550) {
-                    cardWidth =
-                        constraints.maxWidth - 48; // Full width - padding
-                  } else if (constraints.maxWidth < 1100 &&
-                      _items.length == 3) {
-                    // If on medium screen with 3 items, maybe make them smaller to fit 2 or keep 500
-                    // Let's stick to 500 max width or adjust if container is smaller
-                    cardWidth = 500;
-                  }
-
+              CarouselSlider.builder(
+                itemCount: _items.length,
+                itemBuilder: (context, index, realIndex) {
+                  final item = _items[index];
                   return AnimatedEntry(
                     delay: Duration(milliseconds: 300 + (index * 100)),
-                    child: MagicalHoverCard(
-                      width: cardWidth,
-                      height: 400,
-                      borderRadius: BorderRadius.circular(20),
-                      child: _buildGalleryCard(item),
+                    child: Padding(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      child: _buildGalleryCard(item, isMobile),
+                    ),
+                  );
+                },
+                options: CarouselOptions(
+                  height: cardHeight,
+                  viewportFraction: viewportFraction,
+                  enlargeCenterPage: true,
+                  enlargeFactor: 0.12,
+                  enableInfiniteScroll: true,
+                  autoPlay: false,
+                  onPageChanged: (index, reason) {
+                    setState(() {
+                      _currentIndex = index;
+                    });
+                  },
+                ),
+              ),
+              const SizedBox(height: 20),
+
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: _items.asMap().entries.map((entry) {
+                  return Container(
+                    width: _currentIndex == entry.key ? 20 : 8,
+                    height: 8,
+                    margin: const EdgeInsets.symmetric(horizontal: 3),
+                    decoration: BoxDecoration(
+                      borderRadius: BorderRadius.circular(4),
+                      color: _currentIndex == entry.key
+                          ? AppColors.accent
+                          : AppColors.text.withValues(alpha: 0.2),
                     ),
                   );
                 }).toList(),
-              );
-            },
+              ),
+            ],
           ),
-        ],
-      ),
+        );
+      },
     );
   }
 
-  Widget _buildGalleryCard(Map<String, dynamic> item) {
-    return InkWell(
-      onTap: () {
-        showDialog(
-          context: context,
-          barrierColor: Colors.black.withValues(alpha: 0.9),
-          builder: (context) =>
-              ImageGalleryModal(images: item['images'] as List<String>),
-        );
-      },
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          Image.asset(item['image']! as String, fit: BoxFit.cover),
-          // Gradient Overlay
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-                colors: [
-                  Colors.transparent,
-                  Colors.black.withValues(alpha: 0.8),
-                ],
-                stops: const [0.5, 1.0],
+  Widget _buildGalleryCard(Map<String, dynamic> item, bool isMobile) {
+    final titleFontSize = isMobile ? 18.0 : 22.0;
+    final descFontSize = isMobile ? 12.0 : 14.0;
+    final contentPadding = isMobile ? 16.0 : 24.0;
+
+    return ClipRRect(
+      borderRadius: BorderRadius.circular(20),
+      child: InkWell(
+        onTap: () {
+          showDialog(
+            context: context,
+            barrierColor: Colors.black.withValues(alpha: 0.9),
+            builder: (context) =>
+                ImageGalleryModal(images: item['images'] as List<String>),
+          );
+        },
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            Image.asset(item['image']! as String, fit: BoxFit.cover),
+            // Gradient Overlay
+            Container(
+              decoration: BoxDecoration(
+                gradient: LinearGradient(
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                  colors: [
+                    Colors.transparent,
+                    Colors.black.withValues(alpha: 0.8),
+                  ],
+                  stops: const [0.4, 1.0],
+                ),
               ),
             ),
-          ),
-          // Text Content with Icon hint
-          Positioned(
-            bottom: 24,
-            left: 24,
-            right: 24,
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        item['title']! as String,
-                        style: const TextStyle(
-                          color: Colors.white,
-                          fontSize: 24,
-                          fontWeight: FontWeight.bold,
+            // Text Content with Icon hint
+            Positioned(
+              bottom: contentPadding,
+              left: contentPadding,
+              right: contentPadding,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  Row(
+                    children: [
+                      Expanded(
+                        child: Text(
+                          item['title']! as String,
+                          style: TextStyle(
+                            color: Colors.white,
+                            fontSize: titleFontSize,
+                            fontWeight: FontWeight.bold,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                    ),
-                    const Icon(
-                      Icons.collections_outlined,
-                      color: Colors.white,
-                      size: 24,
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 8),
-                Text(
-                  item['description']! as String,
-                  style: TextStyle(
-                    color: Colors.white.withValues(alpha: 0.9),
-                    fontSize: 14,
+                      const SizedBox(width: 8),
+                      Icon(
+                        Icons.collections_outlined,
+                        color: Colors.white.withValues(alpha: 0.8),
+                        size: isMobile ? 20 : 24,
+                      ),
+                    ],
                   ),
-                ),
-              ],
+                  const SizedBox(height: 6),
+                  Text(
+                    item['description']! as String,
+                    style: TextStyle(
+                      color: Colors.white.withValues(alpha: 0.9),
+                      fontSize: descFontSize,
+                    ),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ],
+              ),
             ),
-          ),
-        ],
+          ],
+        ),
       ),
     );
   }

@@ -1,5 +1,6 @@
 import 'package:anumero1_flutter_web/presentation/sections/suites_section.dart';
 import 'package:anumero1_flutter_web/presentation/widgets/suite_card.dart';
+import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
@@ -12,8 +13,11 @@ void main() {
     await tester.pumpWidget(
       const MaterialApp(home: Scaffold(body: SuitesSection())),
     );
-    await tester.pumpAndSettle();
-    expect(find.text('Nossas Suítes'), findsOneWidget);
+    // Use pump with duration instead of pumpAndSettle to avoid animation timeout
+    await tester.pump(const Duration(milliseconds: 500));
+
+    // Now uses CarouselSlider instead of Wrap
+    expect(find.byType(CarouselSlider), findsOneWidget);
     expect(find.byType(SuiteCard), findsWidgets);
   });
 }

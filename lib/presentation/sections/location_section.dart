@@ -2,6 +2,7 @@ import 'package:anumero1_flutter_web/core/theme/app_colors.dart';
 import 'package:anumero1_flutter_web/presentation/widgets/animated_entry.dart';
 import 'package:flutter/material.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+import 'package:pointer_interceptor/pointer_interceptor.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 class LocationSection extends StatelessWidget {
@@ -190,18 +191,20 @@ class LocationSection extends StatelessWidget {
             Positioned(
               bottom: 16,
               right: 16,
-              child: ElevatedButton.icon(
-                onPressed: () => launchUrl(
-                  Uri.parse('https://maps.app.goo.gl/3HHnCsLjS6CnV4bY8'),
-                ),
-                icon: const Icon(Icons.open_in_new, size: 18),
-                label: const Text('Abrir no Google Maps'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.white,
-                  foregroundColor: AppColors.primary,
-                  elevation: 4,
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(30),
+              child: PointerInterceptor(
+                child: ElevatedButton.icon(
+                  onPressed: () => launchUrl(
+                    Uri.parse('https://maps.app.goo.gl/3HHnCsLjS6CnV4bY8'),
+                  ),
+                  icon: const Icon(Icons.open_in_new, size: 18),
+                  label: const Text('Abrir no Google Maps'),
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.white,
+                    foregroundColor: AppColors.primary,
+                    elevation: 4,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(30),
+                    ),
                   ),
                 ),
               ),

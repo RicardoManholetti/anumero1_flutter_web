@@ -10,40 +10,47 @@ class AboutSection extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      padding: const EdgeInsets.symmetric(vertical: 100, horizontal: 48),
-      color: const Color(0xFFF9F9F9), // Very light grey/off-white background
-      child: LayoutBuilder(
-        builder: (context, constraints) {
-          final isWide = constraints.maxWidth > 900;
-          return isWide
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final isMobile = constraints.maxWidth < 600;
+        final isWide = constraints.maxWidth > 900;
+        final horizontalPadding = isMobile ? 16.0 : 48.0;
+        final verticalPadding = isMobile ? 48.0 : 100.0;
+
+        return Container(
+          padding: EdgeInsets.symmetric(
+            vertical: verticalPadding,
+            horizontal: horizontalPadding,
+          ),
+          color: const Color(0xFFF9F9F9),
+          child: isWide
               ? Row(
                   crossAxisAlignment: CrossAxisAlignment.center,
                   children: [
-                    Expanded(child: _buildImage()),
+                    Expanded(child: _buildImage(isMobile)),
                     const SizedBox(width: 64),
-                    Expanded(child: _buildContent(context)),
+                    Expanded(child: _buildContent(context, isMobile)),
                   ],
                 )
               : Column(
                   children: [
-                    _buildImage(),
-                    const SizedBox(height: 48),
-                    _buildContent(context),
+                    _buildImage(isMobile),
+                    const SizedBox(height: 32),
+                    _buildContent(context, isMobile),
                   ],
-                );
-        },
-      ),
+                ),
+        );
+      },
     );
   }
 
-  Widget _buildImage() {
+  Widget _buildImage(bool isMobile) {
     return AnimatedEntry(
       child: FloatingWidget(
-        amplitude: 10,
+        amplitude: isMobile ? 5 : 10,
         duration: const Duration(seconds: 4),
         child: Container(
-          height: 500,
+          height: isMobile ? 280 : 500,
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(24),
             boxShadow: [
@@ -63,29 +70,26 @@ class AboutSection extends StatelessWidget {
     );
   }
 
-  Widget _buildContent(BuildContext context) {
+  Widget _buildContent(BuildContext context, bool isMobile) {
     final features = [
       {
         'icon': FontAwesomeIcons.shoePrints,
-        'title': 'Apenas 5min andando\npra praia',
+        'title': 'Apenas 5min andando pra praia',
       },
       {'icon': FontAwesomeIcons.water, 'title': 'Piscina ao Ar Livre'},
       {
         'icon': FontAwesomeIcons.snowflake,
-        'title': 'Ar-Condicionado em\ntodas as suítes',
+        'title': 'Ar-Condicionado em todas as suítes',
       },
       {'icon': FontAwesomeIcons.fireBurner, 'title': 'Área de Churrasqueira'},
       {
         'icon': FontAwesomeIcons.car,
-        'title': 'Estacionamento Privativo\nGrátis',
+        'title': 'Estacionamento Privativo Grátis',
       },
-      {
-        'icon': FontAwesomeIcons.paw,
-        'title': 'Permitido Animais de\nEstimação',
-      },
+      {'icon': FontAwesomeIcons.paw, 'title': 'Permitido Animais de Estimação'},
       {
         'icon': FontAwesomeIcons.solidSnowflake,
-        'title': 'Geladeira em todas\nas suítes',
+        'title': 'Geladeira em todas as suítes',
       },
     ];
 
@@ -183,15 +187,15 @@ class AboutSection extends StatelessWidget {
     required String title,
     double width = 200,
   }) {
-    // Premium Magical Card implementation
+    // Premium Magical Card implementation - flexible height for text wrapping
     return MagicalHoverCard(
       width: width,
-      height: 90, // Slightly taller for better breathing room
+      height: 100, // Increased height to accommodate wrapped text
       backgroundColor: AppColors.primary,
-      spotlightColor: AppColors.accent, // Gold glow on Teal background
+      spotlightColor: AppColors.accent,
       borderRadius: BorderRadius.circular(16),
       child: Padding(
-        padding: const EdgeInsets.all(16),
+        padding: const EdgeInsets.all(14),
         child: Row(
           children: [
             Container(
@@ -202,7 +206,7 @@ class AboutSection extends StatelessWidget {
               ),
               child: FaIcon(icon, color: Colors.white, size: 20),
             ),
-            const SizedBox(width: 14),
+            const SizedBox(width: 12),
             Expanded(
               child: Text(
                 title,
@@ -213,8 +217,7 @@ class AboutSection extends StatelessWidget {
                   height: 1.3,
                   letterSpacing: 0.3,
                 ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+                // Allow text to wrap naturally - no maxLines or overflow.ellipsis
               ),
             ),
           ],

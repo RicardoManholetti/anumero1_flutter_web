@@ -9,6 +9,7 @@ class LuxuryButton extends StatefulWidget {
   final Color? textColor;
   final double? width;
   final IconData? icon;
+  final bool compact;
 
   const LuxuryButton({
     super.key,
@@ -18,6 +19,7 @@ class LuxuryButton extends StatefulWidget {
     this.textColor,
     this.width,
     this.icon,
+    this.compact = false,
   });
 
   @override
@@ -75,7 +77,9 @@ class _LuxuryButtonState extends State<LuxuryButton>
               width: widget.width,
               transform: Matrix4.identity()..scale(scale),
               transformAlignment: Alignment.center,
-              padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
+              padding: widget.compact
+                  ? const EdgeInsets.symmetric(horizontal: 20, vertical: 12)
+                  : const EdgeInsets.symmetric(horizontal: 32, vertical: 18),
               decoration: BoxDecoration(
                 color: bgColor,
                 borderRadius: BorderRadius.circular(12),
