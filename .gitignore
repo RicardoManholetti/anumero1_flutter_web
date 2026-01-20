@@ -1,0 +1,64 @@
+# Miscellaneous
+*.class
+*.log
+*.pyc
+*.swp
+.DS_Store
+.atom/
+.buildlog/
+.history
+.svn/
+
+# IntelliJ
+*.iml
+*.ipr
+*.iws
+.idea/
+
+# Visual Studio Code
+.vscode/
+
+# Flutter/Dart/Pub
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.packages
+.pub-cache/
+.pub/
+/build/
+
+# Web
+node_modules/
+npm-debug.log
+yarn-error.log
+
+# Mac
+.DS_Store
+
+# Project Specific Rules
+# ----------------------
+
+# Ignore all markdown files (plans, skills, notes)
+*.md
+# Exception: Allow README.md
+!README.md
+
+# Ignore skills folder completely
+skills/
+
+# Ignore internal documentation and guidelines
+docs/
+*.pdf
+*.rtf
+HotelHub_guideline.html
+A_numero1_suites_guidelines.pdf
+A_numero1_suites_html.rtf
+
+# Ignore logs
+flutter_*.log
+
+# Ignore build scripts (often contain local paths)
+build_vercel.sh
+
+# Ignore local metadata
+.metadata
