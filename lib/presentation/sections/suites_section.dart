@@ -26,11 +26,11 @@ class SuitesSection extends StatelessWidget {
       'description':
           'Nossa maior suíte, perfeita para grupos grandes. Possui duas camas de casal e cozinha.',
       'images': [
-        'assets/estudio-família-com-cozinha/Estudio-familia-com-cozinha2.jpg',
-        'assets/estudio-família-com-cozinha/Estudio-familia-com-cozinha4.jpg',
-        'assets/estudio-família-com-cozinha/Estudio-familia-com-cozinha1.jpg',
-        'assets/estudio-família-com-cozinha/Estudio-familia-com-cozinha3.jpg',
-        'assets/estudio-família-com-cozinha/Estudio-familia-com-cozinha5.jpg',
+        'assets/estudio-familia-com-cozinha/Estudio-familia-com-cozinha2.jpg',
+        'assets/estudio-familia-com-cozinha/Estudio-familia-com-cozinha4.jpg',
+        'assets/estudio-familia-com-cozinha/Estudio-familia-com-cozinha1.jpg',
+        'assets/estudio-familia-com-cozinha/Estudio-familia-com-cozinha3.jpg',
+        'assets/estudio-familia-com-cozinha/Estudio-familia-com-cozinha5.jpg',
       ],
     },
     {
@@ -39,11 +39,11 @@ class SuitesSection extends StatelessWidget {
       'description':
           'Layout compacto e funcional com cama de casal e sofá-cama.',
       'images': [
-        'assets/quarto familia/Quarto-Familia1.jpg',
-        'assets/quarto familia/Quarto-Familia2.jpg',
-        'assets/quarto familia/Quarto-Familia3.jpg',
-        'assets/quarto familia/Quarto-Familia4.jpg',
-        'assets/quarto familia/Quarto-Familia5.jpg',
+        'assets/quarto-familia/Quarto-Familia1.jpg',
+        'assets/quarto-familia/Quarto-Familia2.jpg',
+        'assets/quarto-familia/Quarto-Familia3.jpg',
+        'assets/quarto-familia/Quarto-Familia4.jpg',
+        'assets/quarto-familia/Quarto-Familia5.jpg',
       ],
     },
     {
