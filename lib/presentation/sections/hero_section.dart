@@ -85,17 +85,93 @@ class _HeroSectionState extends State<HeroSection> {
     }
   }
 
+  int _guestCount = 2;
+
+  Future<void> _selectGuests(BuildContext context) async {
+    final int? picked = await showDialog<int>(
+      context: context,
+      builder: (BuildContext context) {
+        return Dialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(20),
+          ),
+          child: ConstrainedBox(
+            constraints: const BoxConstraints(maxWidth: 300),
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: Column(
+                mainAxisSize: MainAxisSize.min,
+                children: [
+                  const Text(
+                    'Selecione a quantidade de hóspedes',
+                    style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
+                  const SizedBox(height: 16),
+                  Wrap(
+                    spacing: 8,
+                    runSpacing: 8,
+                    alignment: WrapAlignment.center,
+                    children: List.generate(8, (index) {
+                      final count = index + 1;
+                      final isSelected = count == _guestCount;
+                      return InkWell(
+                        onTap: () => Navigator.of(context).pop(count),
+                        borderRadius: BorderRadius.circular(12),
+                        child: Container(
+                          width: 50,
+                          height: 50,
+                          decoration: BoxDecoration(
+                            color: isSelected
+                                ? AppColors.primary
+                                : Colors.grey.withValues(alpha: 0.1),
+                            borderRadius: BorderRadius.circular(12),
+                            border: Border.all(
+                              color: isSelected
+                                  ? AppColors.primary
+                                  : Colors.grey.withValues(alpha: 0.3),
+                            ),
+                          ),
+                          alignment: Alignment.center,
+                          child: Text(
+                            '$count',
+                            style: TextStyle(
+                              color: isSelected ? Colors.white : AppColors.text,
+                              fontWeight: FontWeight.bold,
+                              fontSize: 18,
+                            ),
+                          ),
+                        ),
+                      );
+                    }),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+
+    if (picked != null && picked != _guestCount) {
+      setState(() {
+        _guestCount = picked;
+      });
+    }
+  }
+
   void _openWhatsApp() {
     String message;
     if (_checkInDate != null && _checkOutDate != null) {
       message = Uri.encodeComponent(
-        'Olá! Gostaria de obter mais informações sobre a reserva para as datas:\n'
+        'Olá! Gostaria de obter mais informações sobre a reserva:\n'
         'Check-in: ${_dateFormat.format(_checkInDate!)}\n'
-        'Check-out: ${_dateFormat.format(_checkOutDate!)}',
+        'Check-out: ${_dateFormat.format(_checkOutDate!)}\n'
+        'Hóspedes: $_guestCount',
       );
     } else {
       message = Uri.encodeComponent(
-        'Olá! Gostaria de consultar disponibilidade para a Pousada A Número 1.',
+        'Olá! Gostaria de consultar disponibilidade para a Pousada A Número 1 para $_guestCount hóspedes.',
       );
     }
     launchUrl(Uri.parse('https://wa.me/5511947243870?text=$message'));
@@ -490,6 +566,8 @@ class _HeroSectionState extends State<HeroSection> {
           ],
         ),
         const SizedBox(height: 12),
+        _buildGuestInputCompact(context),
+        const SizedBox(height: 12),
         SizedBox(
           width: double.infinity,
           child: PremiumButton(
@@ -504,36 +582,53 @@ class _HeroSectionState extends State<HeroSection> {
   }
 
   // Desktop/Tablet: Horizontal layout
+  // Desktop/Tablet: Horizontal layout
   Widget _buildDesktopBookingForm(BuildContext context, bool isTablet) {
-    final inputWidth = isTablet ? 160.0 : 200.0;
-
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        _buildDateInput(
-          context,
-          'Check-in',
-          Icons.calendar_today,
-          _checkInDate,
-          () => _selectDate(context, true),
-          inputWidth,
-        ),
-        const SizedBox(width: 16),
-        _buildDateInput(
-          context,
-          'Check-out',
-          Icons.calendar_today_outlined,
-          _checkOutDate,
-          () => _selectDate(context, false),
-          inputWidth,
-        ),
-        const SizedBox(width: 24),
-        PremiumButton(
-          text: isTablet ? 'RESERVAR' : 'RESERVAR VIA WHATSAPP',
-          onPressed: _openWhatsApp,
-          isPrimary: true,
-        ),
-      ],
+    return ConstrainedBox(
+      constraints: const BoxConstraints(maxWidth: 900),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Flexible(
+            flex: 3,
+            child: _buildDateInput(
+              context,
+              'Check-in',
+              Icons.calendar_today,
+              _checkInDate,
+              () => _selectDate(context, true),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Flexible(
+            flex: 3,
+            child: _buildDateInput(
+              context,
+              'Check-out',
+              Icons.calendar_today_outlined,
+              _checkOutDate,
+              () => _selectDate(context, false),
+            ),
+          ),
+          const SizedBox(width: 16),
+          Flexible(
+            flex: 2,
+            child: _buildGuestInput(
+              context,
+              'Hóspedes',
+              Icons.people_outline,
+              _guestCount,
+              () => _selectGuests(context),
+            ),
+          ),
+          const SizedBox(width: 24),
+          PremiumButton(
+            text: isTablet ? 'RESERVAR' : 'RESERVAR VIA WHATSAPP',
+            onPressed: _openWhatsApp,
+            isPrimary: true,
+          ),
+        ],
+      ),
     );
   }
 
@@ -594,6 +689,54 @@ class _HeroSectionState extends State<HeroSection> {
     );
   }
 
+  Widget _buildGuestInputCompact(BuildContext context) {
+    return InkWell(
+      onTap: () => _selectGuests(context),
+      borderRadius: BorderRadius.circular(12),
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 10),
+        decoration: BoxDecoration(
+          color: Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(12),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              'HÓSPEDES',
+              style: TextStyle(
+                color: AppColors.text.withValues(alpha: 0.5),
+                fontSize: 10,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 0.5,
+              ),
+            ),
+            const SizedBox(height: 4),
+            Row(
+              children: [
+                const Icon(
+                  Icons.people_outline,
+                  size: 14,
+                  color: AppColors.primary,
+                ),
+                const SizedBox(width: 6),
+                Text(
+                  '$_guestCount pessoas',
+                  style: const TextStyle(
+                    color: AppColors.text,
+                    fontWeight: FontWeight.bold,
+                    fontSize: 13,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   // Full date input for desktop
   Widget _buildDateInput(
     BuildContext context,
@@ -601,14 +744,13 @@ class _HeroSectionState extends State<HeroSection> {
     IconData icon,
     DateTime? selectedDate,
     VoidCallback onTap,
-    double width,
   ) {
     return InkWell(
       onTap: onTap,
       borderRadius: BorderRadius.circular(16),
       child: Container(
-        width: width,
-        padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
+        constraints: const BoxConstraints(maxWidth: 220, minWidth: 140),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
         decoration: BoxDecoration(
           color: Colors.grey.withValues(alpha: 0.1),
           borderRadius: BorderRadius.circular(16),
@@ -630,16 +772,72 @@ class _HeroSectionState extends State<HeroSection> {
               children: [
                 Icon(icon, size: 18, color: AppColors.primary),
                 const SizedBox(width: 12),
-                Text(
-                  selectedDate != null
-                      ? _dateFormat.format(selectedDate)
-                      : 'Selecione',
-                  style: TextStyle(
-                    color: selectedDate != null
-                        ? AppColors.text
-                        : AppColors.text.withValues(alpha: 0.5),
-                    fontWeight: FontWeight.bold,
-                    fontSize: 16,
+                Expanded(
+                  child: Text(
+                    selectedDate != null
+                        ? _dateFormat.format(selectedDate)
+                        : 'Selecione',
+                    style: TextStyle(
+                      color: selectedDate != null
+                          ? AppColors.text
+                          : AppColors.text.withValues(alpha: 0.5),
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildGuestInput(
+    BuildContext context,
+    String label,
+    IconData icon,
+    int count,
+    VoidCallback onTap,
+  ) {
+    return InkWell(
+      onTap: onTap,
+      borderRadius: BorderRadius.circular(16),
+      child: Container(
+        // Removed fixed width
+        constraints: const BoxConstraints(maxWidth: 180, minWidth: 120),
+        padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+        decoration: BoxDecoration(
+          color: Colors.grey.withValues(alpha: 0.1),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(
+              label.toUpperCase(),
+              style: TextStyle(
+                color: AppColors.text.withValues(alpha: 0.5),
+                fontSize: 12,
+                fontWeight: FontWeight.bold,
+                letterSpacing: 1.0,
+              ),
+            ),
+            const SizedBox(height: 8),
+            Row(
+              children: [
+                Icon(icon, size: 18, color: AppColors.primary),
+                const SizedBox(width: 12),
+                Expanded(
+                  child: Text(
+                    '$count',
+                    style: const TextStyle(
+                      color: AppColors.text,
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                    ),
                   ),
                 ),
               ],

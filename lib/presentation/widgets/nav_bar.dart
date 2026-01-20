@@ -16,7 +16,7 @@ class NavBar extends StatelessWidget {
   Widget build(BuildContext context) {
     return LayoutBuilder(
       builder: (context, constraints) {
-        final isMobile = constraints.maxWidth < 900;
+        final isMobile = constraints.maxWidth < 1200;
         final logoSize = isMobile
             ? (isScrolled ? 40.0 : 60.0)
             : (isScrolled ? 60.0 : 100.0);
